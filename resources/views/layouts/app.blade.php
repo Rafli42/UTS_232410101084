@@ -8,10 +8,16 @@
     <title>Document</title>
 </head>
 <body class="bg-gray-200">
-    <x-navbar />
+    @isset($id)
+        <x-navbar :id="$id"/>
+    @else
+        <x-navbar />
+    @endisset
+
     <main>
         @yield('content')
     </main>
+
     <x-footer />
     @stack('scripts')
 </body>

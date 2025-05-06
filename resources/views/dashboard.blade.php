@@ -7,22 +7,7 @@
         <div>
             <h3 class="text-xl font-medium">Username : Haudan</h3>
             <h3 class="text-xl font-medium">Nama : Haudan</h3>
+            <p class="text-xl font-medium">Jumlah produk yang tersedia: <strong>{{ $barang }}</strong></p>
         </div>
-        <table class="table-auto w-full border border-gray-300">
-            <thead class="bg-gray-500">
-                <tr>
-                    <th class="border px-4 py-2 text-left">Nama Barang</th>
-                    <th class="border px-4 py-2 text-left">Harga</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($barang as $item)
-                    <tr>
-                        <td class="border px-4 py-2">{{ $item['nama'] }}</td>
-                        <td class="border px-4 py-2">Rp{{ number_format($item['harga'], 0, ',', '.') }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
     </div>
 @endsection

@@ -1,21 +1,22 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Session;
 
 use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
-    private $users=[
+    private $users = [
         [
+            'id' => '1',
             'nama' => 'Haudan',
             'username' => 'Haudan',
             'password' => 'Haudan',
             'alamat' => 'JL. Karimata Gg. Bukit Permai Cluster No.7',
             'no_hp' => '081232378068'
         ]
-        ];
+    ];
+
     private $barang = [
         ['nama' => 'Turbo', 'harga' => 2000000],
         ['nama' => 'Brembo', 'harga' => 5000000],
@@ -30,100 +31,81 @@ class PageController extends Controller
         ['nama' => 'Boost Gouge', 'harga' => 700000],
         ['nama' => 'Oli MOTOUL', 'harga' => 750000],
         ['nama' => 'Ban Nankang', 'harga' => 2450000],
-
     ];
 
     public function login()
     {
-        if (Session::has('user')) {
-            return redirect(route('dashboard'));
-        }
         return view('login');
     }
 
     public function loginStore(Request $request)
-        {
-            $request->validate([
-                'username' => 'required',
-                'password' => 'required',
-            ],
-            [
-                'username.required' => 'harap mengisi username',
-                'password.required' => 'harap mengisi password'
-            ]);
+    {
+        $request->validate([
+            'username' => 'required',
+            'password' => 'required',
+        ], [
+            'username.required' => 'harap mengisi username',
+            'password.required' => 'harap mengisi password'
+        ]);
 
-        foreach ($this->users as $user)
-        {
-            if($user['username'] === $request->username && $user['password'] === $request->password)
-            {
-                Session::put('user', ['username' => $user['username'],'nama' => $user['nama'],'alamat' => $user['alamat'] ,'no_hp' => $user['no_hp'] ]);
-                return redirect()->route('dashboard');
+        foreach ($this->users as $user) {
+            if ($user['username'] === $request->username && $user['password'] === $request->password) {
+                return redirect()->route('dashboard', ['id' => $user['id']]);
             }
         }
-        return back();
+
+        return back()->withErrors(['login' => 'Username atau password salah']);
     }
-    public function Logout()
+
+    public function logout()
     {
-        Session::flash('user');
-        Session::flash('keranjang');
         return redirect()->route('showlogin');
     }
 
-    public function dashboard()
+    public function dashboard($id)
     {
-        if (!Session::has('user')) {
+        $user = collect($this->users)->firstWhere('id', $id);
+
+        if (!$user) {
             return redirect(route('showlogin'));
         }
 
+        $produk = count($this->barang);
+
         return view('dashboard', [
-            'barang' => $this->barang,
+            'barang' => $produk,
+            'id' => $id,
         ]);
     }
 
-    public function profile()
+    public function showprofile($id)
     {
-        if (!Session::has('user')) {
+        $user = collect($this->users)->firstWhere('id', $id);
+
+        if (!$user) {
             return redirect(route('showlogin'));
         }
 
-        return view('profile', ['user' => Session::get('user')]);
+        return view('profile', [
+                'id' => $id,
+                'nama' => $user['nama'],
+                'username' => $user['username'],
+                'alamat' => $user['alamat'],
+                'no_hp' => $user['no_hp']
+            ]);
     }
-    public function pengelolaan()
+
+    public function pengelolaan($id)
     {
-        if (!Session::has('user')) {
+        $user = collect($this->users)->firstWhere('id', $id);
+
+        if (!$user) {
             return redirect(route('showlogin'));
         }
 
         return view('pengelolaan', [
             'barang' => $this->barang,
-            'keranjang' => Session::get('keranjang', []),
-            'total' => Session::get('total', 0),
+            'id' => $id,
         ]);
     }
-    public function tambahBarang(Request $request)
-{
-    $barangNama = $request->input('nama');
-    $jumlah = (int)$request->input('jumlah');
-
-    foreach ($this->barang as $item) {
-        if ($item['nama'] === $barangNama) {
-            $totalHarga = $item['harga'] * $jumlah;
-            $keranjang = Session::get('keranjang', []);
-            $keranjang[] = [
-                'nama' => $item['nama'],
-                'harga' => $item['harga'],
-                'jumlah' => $jumlah,
-                'total' => $totalHarga,
-            ];
-            Session::put('keranjang', $keranjang);
-
-            $total = Session::get('total', 0);
-            $total += $totalHarga;
-            Session::put('total', $total);
-            break;
-        }
-    }
-
-    return redirect()->route('pengelolaan');
-}
 }
