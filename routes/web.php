@@ -1,20 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PageController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-Route::get('/login', function () {
-    return view('login');
-});
-Route::get('/dashboard', function () {
-    return view('dashboard');
-});
-Route::get('/pengelolaan', function () {
-    return view('pengelolaan');
-});
-Route::get('/profile', function () {
-    return view('profile');
-});
+
+Route::get('/login', [pageController::class, 'login'])->name('showlogin');
+Route::post('/login', [pageController::class, 'loginStore'])->name('login');
+Route::post('logout', [pageController::class, 'logout'])->name('logout');
+
+Route::get('/dashboard', [PageController::class, 'dashboard'])->name('dashboard');
+Route::get('/pengelolaan', [PageController::class, 'pengelolaan'])->name('pengelolaan');
+Route::post('/tambah-barang', [PageController::class, 'tambahBarang'])->name('tambah.barang');
+
+Route::get('/profile', [pageController::class, 'profile'])->name('profile');
 

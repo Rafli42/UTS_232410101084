@@ -7,9 +7,12 @@
     @vite('resources/css/app.css')
     <title>Document</title>
 </head>
-<body>
-    <x-navbar></x-navbar>
-    @yield('content')
+<body class="bg-gray-200">
+    <x-navbar />
+    <main>
+        @yield('content')
+    </main>
+    <x-footer />
     @stack('scripts')
 </body>
 </html>
